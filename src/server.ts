@@ -9,9 +9,9 @@ app.use(express.json());
 //`extended : true` allow rich objects and arrays vai query string library
 app.use(express.urlencoded({ extended: true }));
 
-connectDB();
-app.use("/api/v1", Router);
 
-app.listen(4000, () => {
+app.use("/api/v1", Router);
+connectDB();
+app.listen(5000, () => {
   console.log(`server run on port 4000`);
 });
