@@ -8,6 +8,11 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
+
+// app.use("/api/v1", Router);
+// connectDB();
+// app.listen(5000, () => {
+//   console.log(`server run on port 4000`);
 // Root route — shows message when visiting http://localhost:4000
 // app.get("/", (req, res) => {
 //   res.send("Server is running on port 4000 🚀");
