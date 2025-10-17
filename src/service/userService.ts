@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { userModel } from "@/model/userModel";
+import { userModel } from "@/models/userModel";
 import { generateToken } from "@/utils/generateToken";
 import bcrypt from "bcrypt";
 
@@ -23,13 +23,19 @@ export const getUserService = async (req: Request, res: Response) => {
   }
 };
 //Create user service
-export const createUserService = async ( req: Request, res: Response ) => {
-    const {name, email, password, phone, role} = req.body;
+export const createUserService = async (req: Request, res: Response) => {
   try {
+    const { name, email, password, phone, role } = req.body;
+
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
-     res.status(201).json({message: "User register successfully"})
+      res.status(201).json({ message: "User Create User  successfully" });
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered",
+      });
     }
+
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -40,12 +46,18 @@ export const createUserService = async ( req: Request, res: Response ) => {
       phone,
       role: role || "user",
     });
+    
     await newUser.save();
 
+    const token = generateToken(
+      newUser.id.toString(),
+      newUser.email,
+      newUser.role || "user"
+    );
 
-    const token = generateToken(newUser.id.toString(), newUser.email, newUser.role || "user");
 
-    return {
+
+    return res.status(201).json({
       success: true,
       data: {
         user: {
@@ -56,16 +68,16 @@ export const createUserService = async ( req: Request, res: Response ) => {
         },
         token,
       },
-    };
+      message: "User registered successfully",
+    });
   } catch (error) {
-    console.error("Create User  Service Error:", error);
-    return {
+    console.error("Registration Service Error:", error);
+    return res.status(500).json({
       success: false,
-      message: " failed to Create User",
-    };
+      message: "An error occurred during registration",
+    });
   }
 };
-
 //Update user  By Id
 export const updateUserService = async (id: string, updateData: any) => {
   try {

@@ -1,19 +1,17 @@
 import { Router } from "express";
 import userRoute from "@/routes/userRoutes";
-import authRoute from "./authRoutes";
+import AuthRoute from "./authRoutes";
+import bookRouter from "./bookRoutes";
+import categoryRoute from "./categoryRoute";
 
 const router = Router();
 
 // router.use("/users/:id", userRoute);
 
 // Auth Route
-router.use("/auth", authRoute);
 router.use("/users", userRoute);
 
-import AuthRoute from "./authRoutes";
-import bookRouter from "./bookRoutes";
-import categoryRoute from "./categoryRoute";
-const router = Router();
+
 
 router.use("/", bookRouter);
 router.use("/books", bookRouter);
