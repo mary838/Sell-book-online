@@ -4,9 +4,7 @@ import Router from "@/routes/index";
 
 const app = express();
 
-
 app.use(express.json());
-
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -15,15 +13,12 @@ app.use(express.urlencoded({ extended: true }));
 //   res.send("Server is running on port 4000 🚀");
 // });
 
-app.use("/api", Router);
-
-
+app.use("/api/v1", Router);
 
 connectDB()
-    .then(() => console.log("Database connected"))
-    .catch((err) => console.error("Database connection failed:", err));
+  .then(() => console.log("Database connected"))
+  .catch((err) => console.error("Database connection failed:", err));
 
-
-app.listen(4000, () => {
+app.listen(5000, () => {
   console.log("✅ Server running on http://localhost:4000");
 });
