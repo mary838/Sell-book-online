@@ -35,6 +35,20 @@ export interface CreateBookInput {
 
 export interface BookResult {
   success: boolean;
-  data: IBook;
+  data: IBook | null;
+  error?: Error;
   message?: string;
 }
+
+// export interface Book {
+//     title: string;
+//     description?: string;
+//     author: string;
+//     publisher?: string;
+//     price: number;
+//     category?: string;
+//     stock?: number;
+//     image?: string;
+//     pages?: number;
+//     language?: string;
+// }
