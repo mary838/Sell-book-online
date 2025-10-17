@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import {Request, Response} from "express";
 import { registerService } from "@/service/authService";
 
-export const registerController = async (req: Request, res: Response):Promise<void> => {
-    const { name, email, password, phone, role } = req.body;
+export const registerController = async (req: Request, res: Response) => {
+    // const {name, email, password, phone, role} = req.body;
 
     try {
-        const result = await registerService(name, email, password, phone, role);
+        const result = await registerService(req , res);
 
         if(!result.success) {
             res.status(400).json({

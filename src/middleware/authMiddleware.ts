@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import {Request, Response, NextFunction} from "express";
 import jwt from "jsonwebtoken";
 
 declare global {
@@ -29,7 +29,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
             role: string;
         };
 
-      req.user = decoded;
+      req.user = decoded,
       next();
      
     } catch(error: unknown) {
