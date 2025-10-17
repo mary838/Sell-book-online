@@ -1,5 +1,5 @@
 import { Router } from "express";
-import AuthRouter from "./authRoute";
+import AuthRoute from "./authRoutes";
 import bookRouter from "./bookRoutes";
 import categoryRoute from "./categoryRoute";
 const router = Router();
@@ -11,6 +11,6 @@ router.use("/updated-book", bookRouter);
 router.use("/delete-book", bookRouter);
 router.use("/categories", categoryRoute);
 // Auth route
-router.use("/auth", AuthRouter);
+router.use("/auth", AuthRoute);
 
 export default router;
