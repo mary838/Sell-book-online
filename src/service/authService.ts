@@ -1,14 +1,15 @@
 import bcrypt from "bcrypt";
 import { userModel } from "@/model/userModel";
 import { generateToken } from "@/utils/generateToken";
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
-export const registerService = async ( req: Request, res: Response ) => {
-    const {name, email, password, phone, role} = req.body;
+export const registerService = async (req: Request, res: Response) => {
+  const { name, email, password, phone, role } = req.body;
   try {
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
-     res.status(201).json({message: "User register successfully"})
+      res.status(201).json({ message: "User register successfully" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -22,8 +23,11 @@ export const registerService = async ( req: Request, res: Response ) => {
     });
     await newUser.save();
 
-
-    const token = generateToken(newUser.id.toString(), newUser.email, newUser.role || "user");
+    const token = generateToken(
+      newUser.id.toString(),
+      newUser.email,
+      newUser.role || "user"
+    );
 
     return {
       success: true,
@@ -43,5 +47,44 @@ export const registerService = async ( req: Request, res: Response ) => {
       success: false,
       message: "Registration failed",
     };
+  }
+};
+
+export const loginService = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  try {
+    const existingUser = await userModel.findOne({ email });
+    if (!existingUser) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const isValidPassword = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+    if (!isValidPassword) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+    const token = jwt.sign(
+      { id: existingUser._id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
+    return res.status(200).json({
+      message: "Login Successful",
+      token,
+      user: {
+        id: existingUser._id,
+        email: existingUser.email,
+        name: existingUser.name,
+      },
+    });
+  } catch (error) {
+    console.error("Login Service Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Login failed. Please try again later.",
+    });
   }
 };
