@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const connectDB = async (): Promise<void> => {
-  const MONGODB_URI = environment.MONGODB_URI as string;
+  const MONGODB_URI = environment.MONGODB_URI;
   try {
     const conn = await mongoose.connect(MONGODB_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);

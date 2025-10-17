@@ -1,16 +1,22 @@
 import bcrypt from "bcrypt";
-import { userModel } from "@/model/userModel";
+import { userModel } from "@/models/userModel";
 import { generateToken } from "@/utils/generateToken";
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 export const registerService = async (req: Request, res: Response) => {
-  const { name, email, password, phone, role } = req.body;
   try {
+    const { name, email, password, phone, role } = req.body;
+
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
       res.status(201).json({ message: "User register successfully" });
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered",
+      });
     }
+
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -21,6 +27,7 @@ export const registerService = async (req: Request, res: Response) => {
       phone,
       role: role || "user",
     });
+    
     await newUser.save();
 
     const token = generateToken(
@@ -29,7 +36,9 @@ export const registerService = async (req: Request, res: Response) => {
       newUser.role || "user"
     );
 
-    return {
+
+
+    return res.status(201).json({
       success: true,
       data: {
         user: {
@@ -40,13 +49,14 @@ export const registerService = async (req: Request, res: Response) => {
         },
         token,
       },
-    };
+      message: "User registered successfully",
+    });
   } catch (error) {
     console.error("Registration Service Error:", error);
-    return {
+    return res.status(500).json({
       success: false,
-      message: "Registration failed",
-    };
+      message: "An error occurred during registration",
+    });
   }
 };
 
