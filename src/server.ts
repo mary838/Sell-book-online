@@ -8,7 +8,6 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-
 // app.use("/api/v1", Router);
 // connectDB();
 // app.listen(5000, () => {
@@ -25,5 +24,5 @@ connectDB()
   .catch((err) => console.error("Database connection failed:", err));
 
 app.listen(5000, () => {
-  console.log("✅ Server running on http://localhost:4000");
+  console.log("✅ Server running on http://localhost:5000");
 });
