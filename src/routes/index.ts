@@ -3,15 +3,15 @@ import userRoute from "@/routes/userRoutes";
 import AuthRoute from "./authRoutes";
 import bookRouter from "./bookRoutes";
 import categoryRoute from "./categoryRoute";
+import cartRoutes from "./cartRoutes";
 
 const router = Router();
 
 // router.use("/users/:id", userRoute);
 
 // Auth Route
+router.use("/cart", cartRoutes);
 router.use("/users", userRoute);
-
-
 
 router.use("/", bookRouter);
 router.use("/books", bookRouter);
