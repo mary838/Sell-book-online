@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { userModel } from "@/models/userModel";
 import { generateToken } from "@/utils/generateToken";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
+import { UserResult , IUser } from "@/types/user";
 
 
 
@@ -22,62 +23,7 @@ export const getUserService = async (req: Request, res: Response) => {
     });
   }
 };
-//Create user service
-export const createUserService = async (req: Request, res: Response) => {
-  try {
-    const { name, email, password, phone, role } = req.body;
 
-    const existingUser = await userModel.findOne({ email });
-    if (existingUser) {
-      res.status(201).json({ message: "User Create User  successfully" });
-      return res.status(400).json({
-        success: false,
-        message: "Email already registered",
-      });
-    }
-
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new userModel({
-      name,
-      email,
-      password: hashedPassword,
-      phone,
-      role: role || "user",
-    });
-    
-    await newUser.save();
-
-    const token = generateToken(
-      newUser.id.toString(),
-      newUser.email,
-      newUser.role || "user"
-    );
-
-
-
-    return res.status(201).json({
-      success: true,
-      data: {
-        user: {
-          id: newUser.id,
-          name: newUser.name,
-          email: newUser.email,
-          role: newUser.role || "user",
-        },
-        token,
-      },
-      message: "User registered successfully",
-    });
-  } catch (error) {
-    console.error("Registration Service Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "An error occurred during registration",
-    });
-  }
-};
 //Update user  By Id
 export const updateUserService = async (id: string, updateData: any) => {
   try {
@@ -135,4 +81,17 @@ export const deleteUserService = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+// Get User By Id
+
+export const getUserByIdService = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await userModel.findById(id);
+  if (!user) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+  return res.status(200).json({ success: true, data: user });
+};
+
 
