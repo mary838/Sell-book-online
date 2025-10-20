@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { ICategory } from "@/types/category";
 
-const categorySchema = new Schema<ICategory>(
+const categorySchema = new Schema<ICategory & Document>(
   {
     name: {
       type: String,
@@ -12,14 +12,17 @@ const categorySchema = new Schema<ICategory>(
     description: {
       type: String,
       trim: true,
-      maxlength: 300,
+      default: "",
     },
   },
   {
-    timestamps: true, // this automatically adds createdAt & updatedAt
+    timestamps: true,
   }
 );
 
-const categoryModel = mongoose.model<ICategory>("Category", categorySchema);
+const CategoryModel = mongoose.model<ICategory & Document>(
+  "Category",
+  categorySchema
+);
 
-export default categoryModel;
+export default CategoryModel;
