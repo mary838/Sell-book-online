@@ -9,7 +9,7 @@ const router = Router();
 // router.use("/users/:id", userRoute);
 
 // Auth Route
-router.use("/users", userRoute);
+router.use("/", userRoute);
 
 
 

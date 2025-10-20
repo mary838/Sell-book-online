@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserService , deleteUserService , updateUserService , createUserService  } from "@/service/userService";
+import { getUserService , deleteUserService , updateUserService , getUserByIdService   } from "@/service/userService";
 
 // Get Users Controller
 export const getUsersController = async (req: Request, res: Response) => {
@@ -22,9 +22,8 @@ export const updateUserController = async (req: Request, res: Response) => {
   const result = await updateUserService(id, updateData);
   return res.status(result.success ? 200 : result.message === "User not found" ? 404 : 500).json(result);
 };
-
-// Create User Controller
-export const createUserController = async (req: Request, res: Response) => {
-  const registerResult = await createUserService(req, res);
-  return registerResult;
+// User by Id
+export const getUserByIdController = (req: Request, res: Response) => {
+  return getUserByIdService(req, res);
 };
+
