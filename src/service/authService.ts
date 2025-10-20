@@ -17,7 +17,6 @@ export const registerService = async (req: Request, res: Response) => {
       });
     }
 
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new userModel({
@@ -27,7 +26,7 @@ export const registerService = async (req: Request, res: Response) => {
       phone,
       role: role || "user",
     });
-    
+
     await newUser.save();
 
     const token = generateToken(
@@ -35,8 +34,6 @@ export const registerService = async (req: Request, res: Response) => {
       newUser.email,
       newUser.role || "user"
     );
-
-
 
     return res.status(201).json({
       success: true,
@@ -76,11 +73,13 @@ export const loginService = async (req: Request, res: Response) => {
     if (!isValidPassword) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    const token = jwt.sign(
-      { id: existingUser._id },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
+
+    const token = generateToken(
+      existingUser._id.toString(),
+      existingUser.email,
+      existingUser.role
     );
+
     return res.status(200).json({
       message: "Login Successful",
       token,
@@ -88,6 +87,7 @@ export const loginService = async (req: Request, res: Response) => {
         id: existingUser._id,
         email: existingUser.email,
         name: existingUser.name,
+        role: existingUser.role,
       },
     });
   } catch (error) {
