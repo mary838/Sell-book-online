@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 //   res.send("Server is running on port 4000 🚀");
 // });
 
-app.use("/api/v1", Router);
+app.use("/api", Router);
 
 connectDB()
   .then(() => console.log("Database connected"))

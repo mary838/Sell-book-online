@@ -11,14 +11,12 @@ const router = Router();
 // Auth Route
 router.use("/users", userRoute);
 
-
-
 router.use("/", bookRouter);
 router.use("/books", bookRouter);
 router.use("/create-book", bookRouter);
 router.use("/updated-book", bookRouter);
 router.use("/delete-book", bookRouter);
-router.use("/categories", categoryRoute);
+router.use("/", categoryRoute);
 // Auth route
 router.use("/auth", AuthRoute);
 

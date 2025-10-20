@@ -1,5 +1,5 @@
 export interface ICategory {
-  _id?: string; // MongoDB uses _id
+  _id?: string;
   name: string;
   description?: string;
   createdAt?: Date;
@@ -13,6 +13,6 @@ export interface CreateCategoryInput {
 
 export interface CategoryResult {
   success: boolean;
-  data: ICategory | null;
+  data?: ICategory | ICategory[] | null;
   message?: string;
 }
