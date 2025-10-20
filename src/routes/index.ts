@@ -3,6 +3,7 @@ import userRoute from "@/routes/userRoutes";
 import AuthRoute from "./authRoutes";
 import bookRouter from "./bookRoutes";
 import categoryRoute from "./categoryRoute";
+import orderRoute from "./orderRoute";
 
 const router = Router();
 
@@ -19,5 +20,10 @@ router.use("/delete-book", bookRouter);
 router.use("/", categoryRoute);
 // Auth route
 router.use("/auth", AuthRoute);
+
+//Oder Route
+router.use("/", orderRoute);
+// router.use("/orders", orderRoute);
+// router.use("/create-order", orderRoute);
 
 export default router;
