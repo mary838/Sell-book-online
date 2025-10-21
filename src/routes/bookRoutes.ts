@@ -35,8 +35,7 @@ bookRouter.delete(
   deleteBookController
 );
 
-
-bookRouter.get("/books/:id", getBookByIdController);
-bookRouter.get("/books", getBookController);
+bookRouter.get("/books/:id", authMiddleware, getBookByIdController);
+bookRouter.get("/books",authMiddleware, getBookController);
 
 export default bookRouter;
