@@ -16,7 +16,7 @@ router.use("/books", bookRouter);
 router.use("/create-book", bookRouter);
 router.use("/updated-book", bookRouter);
 router.use("/delete-book", bookRouter);
-router.use("/", categoryRoute);
+router.use("/categories", categoryRoute);
 // Auth route
 router.use("/auth", AuthRoute);
 

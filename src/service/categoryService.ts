@@ -1,85 +1,84 @@
-import CategoryModel from "@/models/category";
+import CategoryModel from "../models/category";
 import { CategoryResult, CreateCategoryInput } from "@/types/category";
 
-// ✅ Create category
 export const createCategoryService = async (
   categoryData: CreateCategoryInput
 ): Promise<CategoryResult> => {
   try {
-    const newCategory = new CategoryModel(categoryData);
-    const saved = await newCategory.save();
+    const category = new CategoryModel(categoryData);
+    const saved = await category.save();
     return {
       success: true,
       data: saved,
       message: "Category created successfully",
     };
   } catch (error) {
-    return { success: false, message: "Failed to create category", data: null };
+    console.error("Error creating category:", error);
+    return { success: false, data: null, message: "Failed to create category" };
   }
 };
 
-// ✅ Get all categories
-export const getCategoriesService = async (): Promise<CategoryResult> => {
+export const getAllCategoriesService = async (): Promise<CategoryResult> => {
   try {
-    const categories = await CategoryModel.find().sort({ createdAt: -1 });
+    const categories = await CategoryModel.find().populate(
+      "createdBy",
+      "username email"
+    );
     return { success: true, data: categories };
   } catch (error) {
-    return {
-      success: false,
-      message: "Failed to fetch categories",
-      data: null,
-    };
+    return { success: false, data: null, message: "Failed to get categories" };
   }
 };
 
-// ✅ Get single category by ID
 export const getCategoryByIdService = async (
   id: string
 ): Promise<CategoryResult> => {
   try {
-    const category = await CategoryModel.findById(id);
+    const category = await CategoryModel.findById(id).populate(
+      "createdBy",
+      "username email"
+    );
     if (!category)
-      return { success: false, message: "Category not found", data: null };
+      return { success: false, data: null, message: "Category not found" };
     return { success: true, data: category };
   } catch (error) {
-    return { success: false, message: "Failed to get category", data: null };
+    return { success: false, data: null, message: "Error fetching category" };
   }
 };
 
-// ✅ Update category
 export const updateCategoryService = async (
   id: string,
-  data: CreateCategoryInput
+  updates: Partial<CreateCategoryInput>
 ): Promise<CategoryResult> => {
   try {
-    const updated = await CategoryModel.findByIdAndUpdate(id, data, {
+    const updated = await CategoryModel.findByIdAndUpdate(id, updates, {
       new: true,
     });
     if (!updated)
-      return { success: false, message: "Category not found", data: null };
+      return { success: false, data: null, message: "Category not found" };
     return {
       success: true,
       data: updated,
       message: "Category updated successfully",
     };
   } catch (error) {
-    return { success: false, message: "Failed to update category", data: null };
+    return { success: false, data: null, message: "Error updating category" };
   }
 };
 
-// ✅ Delete category
 export const deleteCategoryService = async (
   id: string
 ): Promise<CategoryResult> => {
   try {
     const deleted = await CategoryModel.findByIdAndDelete(id);
     if (!deleted)
-      return { success: false, message: "Category not found", data: null };
+      return { success: false, data: null, message: "Category not found" };
     return {
       success: true,
+      data: deleted,
       message: "Category deleted successfully",
     };
   } catch (error) {
-    return { success: false, message: "Failed to delete category", data: null };
+    return { success: false, data: null, message: "Error deleting category" };
   }
 };
