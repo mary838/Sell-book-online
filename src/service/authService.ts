@@ -8,8 +8,15 @@ export const registerService = async (req: Request, res: Response) => {
     try {
         const { name, email, password, role } = req.body;
 
-        // Check exist User
-        const existingUser = await userModel.findOne({ email });
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered",
+      });
+    }
+
 
         if (existingUser) {
             res.status(201).json({message: "Registered successfully."});
@@ -59,9 +66,10 @@ export const loginService = async (req: Request, res: Response) => {
 
   try {
     const existingUser = await userModel.findOne({ email });
+    console.log("Existing User:", existingUser);
     if (!existingUser) {
       return res.status(400).json({ message: "Invalid credentials" });
-    }
+    } 
 
     const isValidPassword = await bcrypt.compare(
       password,
