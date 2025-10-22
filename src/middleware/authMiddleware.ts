@@ -65,13 +65,27 @@ export const authMiddleware = (
 };
 
 export const checkRoleMiddleware = (...allowedRoles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        if (!req.user) {
-            return handleAuthError(res, 401, "Unauthorized");
-        }
 
-        if (!allowedRoles.includes(req.user.role)) {
-            return handleAuthError(res, 403, "Permission Forbidden.")
+    return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+
+            if (!req.user) {
+                return handleAuthError(res, 401, "Unauthorized.")
+            }
+
+            // Check if role is allowed
+            if (!allowedRoles.includes(req.user.role)) {
+                return handleAuthError(res, 403, "Access forbidden.")
+            }
+
+            
+            next();
+
+        } catch (error) {
+            console.error(`[Role Middleware Error]`, error);
+            return handleAuthError(res, 500, "Unexpected error occurred");
+            // Just kidding remove this when lunch production
+            // return handleAuthError(res, 500, "I don't know. What's wrong?");
         }
-    }
-}
+    };
+};
