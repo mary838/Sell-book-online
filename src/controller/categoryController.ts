@@ -1,19 +1,25 @@
 import { Request, Response } from "express";
 import {
   createCategoryService,
-  getCategoriesService,
+  getAllCategoriesService,
   getCategoryByIdService,
   updateCategoryService,
   deleteCategoryService,
-} from "../service/categoryService";
+} from "@/service/categoryService";
+import { CreateCategoryInput } from "@/types/category";
 
 export const createCategory = async (req: Request, res: Response) => {
-  const result = await createCategoryService(req.body);
-  res.status(result.success ? 201 : 400).json(result);
+  try {
+    const categoryData: CreateCategoryInput = req.body;
+    const result = await createCategoryService(categoryData);
+    res.status(result.success ? 201 : 400).json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
 export const getCategories = async (_req: Request, res: Response) => {
-  const result = await getCategoriesService();
+  const result = await getAllCategoriesService();
   res.status(result.success ? 200 : 400).json(result);
 };
 
