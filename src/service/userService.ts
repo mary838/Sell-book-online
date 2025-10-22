@@ -1,10 +1,5 @@
 import { Request, Response } from "express";
 import { userModel } from "@/models/userModel";
-import { generateToken } from "@/utils/generateToken";
-// import bcrypt from "bcrypt";
-import { UserResult , IUser } from "@/types/user";
-
-
 
 export const getUserService = async (req: Request, res: Response) => {
   try {

@@ -1,6 +1,6 @@
 import { Response } from "express";
 
-export const handleAuthError =(
+export const handleError =(
     res: Response,
     status: number,
     message: string,
