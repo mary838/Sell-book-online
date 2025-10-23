@@ -65,12 +65,12 @@ export const checkRoleMiddleware = (...allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
-        return handleAuthError(res, 401, "Unauthorized.");
+        return handleError(res, 401, "Unauthorized.");
       }
 
       // Check if role is allowed
       if (!allowedRoles.includes(req.user.role)) {
-        return handleAuthError(res, 403, "Access forbidden.");
+        return handleError(res, 403, "Access forbidden.");
       }
 
       if (!req.user) {
