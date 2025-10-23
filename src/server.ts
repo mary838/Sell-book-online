@@ -1,6 +1,7 @@
 import express from "express";
 import connectDB from "@/config/database";
 import Router from "@/routes/index";
+import "@/models/bookModel"; // in server.ts or cartService.ts
 
 const app = express();
 
