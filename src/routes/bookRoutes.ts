@@ -1,4 +1,4 @@
-import express from "express";
+import { Router }from "express";
 import { 
   authMiddleware, 
   checkRoleMiddleware 
@@ -12,7 +12,7 @@ import {
   getBookByIdController 
 } from "@/controller/bookController";
 
-const bookRouter = express.Router();
+const bookRouter = Router();
 
 bookRouter.post(
   "/create-book",
