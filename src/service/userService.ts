@@ -79,14 +79,21 @@ export const deleteUserService = async (req: Request, res: Response) => {
 
 
 // Get User By Id
-
 export const getUserByIdService = async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = await userModel.findById(id);
   if (!user) {
-    return res.status(404).json({ success: false, message: "User not found" });
+    return res.status(404).json(
+      { 
+        success: false, 
+        message: "User not found" 
+      });
   }
-  return res.status(200).json({ success: true, data: user });
+  return res.status(200).json(
+    { 
+      success: true,
+      data: user }
+    );
 };
 
 

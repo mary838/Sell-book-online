@@ -3,11 +3,13 @@ import userRoute from "@/routes/userRoutes";
 import AuthRoute from "./authRoutes";
 import bookRouter from "./bookRoutes";
 import categoryRoute from "./categoryRoute";
+import orderRoute from "./orderRoutes";
+import orderItemRoute from "./orderItemRoutes";
 
 const router = Router();
-
-// router.use("/users/:id", userRoute);
-
+// Order Routes
+router.use("/orders", orderRoute);
+router.use("/order-items", orderItemRoute); // plural
 // Auth Route
 router.use("/", userRoute);
 
