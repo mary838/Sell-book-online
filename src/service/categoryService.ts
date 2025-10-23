@@ -1,4 +1,4 @@
-import CategoryModel from "../models/category";
+import {CategoryModel} from "../models/category";
 import { CategoryResult, CreateCategoryInput } from "@/types/category";
 
 export const createCategoryService = async (

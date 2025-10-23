@@ -121,7 +121,7 @@ export const logoutService = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (refreshToken) {
-      const findUser = await userModel.findOne({ refreshToken })
+      const findUser = await userModel.findOne({ refreshToken });
       if (findUser) {
         findUser.refreshToken = "",
         await findUser.save();  
@@ -139,8 +139,8 @@ export const logoutService = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Logout error:", error);
     return handleError(res, 500, "False to logout");
-  }
-}
+  };
+};
 
 export const refreshTokenService = async (req: Request, res: Response) => {
   try {
@@ -183,8 +183,6 @@ export const refreshTokenService = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error(error);
-    res.status(403).json({
-      message: "Token expired or invalid"
-    })
+   return handleError(res, 403, "Token expired or invalid");
   }
 }

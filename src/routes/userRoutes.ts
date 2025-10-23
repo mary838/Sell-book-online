@@ -1,19 +1,34 @@
-import express from "express";
+import { Router } from "express";
 import { getUsersController  , deleteUserController , updateUserController , getUserByIdController  } from "@/controller/userController";
-// import { authMiddleware } from "@/middleware/authMiddleware";
+import { authMiddleware, checkRoleMiddleware } from "@/middleware/authMiddleware";
 
-const router = express.Router();
-
+const UserRouter = Router();
 // GET /api/v1/users
-router.get("/users", getUsersController);
+UserRouter.get("/users", 
+    authMiddleware, 
+    checkRoleMiddleware("admin"), 
+    getUsersController
+);
 // DELETE /api/v1/users/:id
-router.delete("/delete-user/:id", deleteUserController);
+UserRouter.delete("/delete-user/:id", 
+    authMiddleware, 
+    checkRoleMiddleware("admin"),
+    deleteUserController
+);
 // Update User By Id
-router.put("/update-user/:id" ,  updateUserController);
+UserRouter.put("/updated-user/:id",
+    authMiddleware, 
+    checkRoleMiddleware("admin"),
+    updateUserController
+);
 // Get User By Id
-router.get("/get-user/:id" , getUserByIdController);
+UserRouter.get("/users/:id" ,
+    authMiddleware, 
+    checkRoleMiddleware("admin"),
+    getUserByIdController
+);
 
 
 
 
-export default router;
+export default UserRouter;

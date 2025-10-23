@@ -79,7 +79,6 @@ export const deleteUserService = async (req: Request, res: Response) => {
 
 
 // Get User By Id
-
 export const getUserByIdService = async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = await userModel.findById(id);
