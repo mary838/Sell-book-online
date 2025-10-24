@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 
 export const registerService = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { full_name, user_name, email, password, role } = req.body;
 
     // Check if user already exists
     const existingUser = await userModel.findOne({ email });
@@ -20,7 +20,8 @@ export const registerService = async (req: Request, res: Response) => {
 
     // Create new user
     const newUser = new userModel({
-      name,
+      full_name,
+      user_name,
       email,
       password: hashPassword,
       role: role || "user",
@@ -47,13 +48,22 @@ export const registerService = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    // Send access token 
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000, 
+    });
+
     return res.status(201).json({
       message: "User registered successfully",
       accessToken,
       data: {
         user: {
           id: newUser.id,
-          name: newUser.name,
+          full_name: newUser.full_name,
+          user_name: newUser.user_name,
           email: newUser.email,
           role: newUser.role,
         },
@@ -99,13 +109,21 @@ export const loginService = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
+    // Send access token 
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000, 
+    });
+
     return res.status(200).json({
       message: "Login Successful",
       accessToken,
       data: {
         user: {
           id: existingUser._id,
-          name: existingUser.name,
+          full_name: existingUser.full_name,
           email: existingUser.email,
           role: existingUser.role,
         },
@@ -174,6 +192,14 @@ export const refreshTokenService = async (req: Request, res: Response) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    // Send access token 
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000, 
     });
 
     return res.status(200).json({
