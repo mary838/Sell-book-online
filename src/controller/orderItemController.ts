@@ -1,23 +1,21 @@
 import { Request, Response } from "express";
-import * as orderItemService from "../service/orderItemService";
+import { createMultipleOrderItems } from "@/service/orderItemService";
 
-// Create OrderItem
-export const createOrderItemController = async (req: Request, res: Response) => {
+export const createMultipleOrderItemsController = async (req: Request, res: Response) => {
   try {
-    const item = await orderItemService.createOrderItem(req.body);
-    res.status(201).json(item);
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-};
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-// Get all OrderItems for an order
-export const getOrderItemsByOrderController = async (req: Request, res: Response) => {
-  try {
-    const { orderId } = req.params;
-    const items = await orderItemService.getOrderItemsByOrderId(orderId);
-    res.json(items);
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    const items = req.body.items; // array of items
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "Items array is required" });
+    }
+
+    const result = await createMultipleOrderItems(items, userId);
+
+    res.status(201).json(result);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to create order items", error: err.message });
   }
 };

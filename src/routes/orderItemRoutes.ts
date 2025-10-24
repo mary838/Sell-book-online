@@ -1,15 +1,10 @@
 import express from "express";
-import {
-  createOrderItemController,
-  getOrderItemsByOrderController,
-} from "../controller/orderItemController";
+import { createMultipleOrderItemsController } from "@/controller/orderItemController";
+import { authMiddleware } from "@/middleware/authMiddleware";
 
 const router = express.Router();
 
-// Create a single OrderItem
-router.post("/", createOrderItemController);
-
-// Get all OrderItems by OrderId
-router.get("/order/:orderId", getOrderItemsByOrderController);
+// POST /api/order-item/bulk
+router.post("/", authMiddleware, createMultipleOrderItemsController);
 
 export default router;

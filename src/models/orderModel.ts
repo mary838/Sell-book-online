@@ -1,24 +1,12 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const OrderSchema = new mongoose.Schema(
+const OrderSchema = new Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    orderItems: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "OrderItem",
-        required: true,
-      },
-    ],
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     totalPrice: { type: Number, required: true },
-    status: { type: String, default: "pending" }, // optional: pending, completed, canceled
+    orderItems: [{ type: Schema.Types.ObjectId, ref: "OrderItem" }],
   },
   { timestamps: true }
 );
 
-export const OrderModel = mongoose.model("Order", OrderSchema);
-
+export const Order = mongoose.model("Order", OrderSchema);

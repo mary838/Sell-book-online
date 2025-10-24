@@ -1,34 +1,89 @@
-import {OrderItemModel} from "../models/orderItemModel";
+import { OrderItem } from "@/models/orderItemModel";
+import { Order } from "@/models/orderModel";
+import mongoose from "mongoose";
 
-export interface OrderItemInput {
-  orderId: string;
+interface OrderItemInput {
   bookId: string;
   quantity: number;
-  sellPrice: number;
+  price: number;
 }
 
-// Create a single OrderItem
-export const createOrderItem = async (input: OrderItemInput) => {
-  const totalPrice = input.quantity * input.sellPrice;
-  const orderItem = new OrderItemModel({
-    ...input,
-    totalPrice,
+// Single order item creation (optional)
+export const createOrderItemAuto = async (item: OrderItemInput, userId: string, orderId?: string) => {
+  if (!item.bookId || item.quantity == null || item.price == null) {
+    throw new Error("Missing required fields for OrderItem");
+  }
+
+  // Create order if not provided
+  if (!orderId) {
+    const order = await Order.create({
+      userId: new mongoose.Types.ObjectId(userId),
+      totalPrice: 0,
+      orderItems: [],
+    });
+    orderId = order._id.toString();
+  }
+
+  const orderItem = await OrderItem.create({
+    orderId: new mongoose.Types.ObjectId(orderId),
+    bookId: new mongoose.Types.ObjectId(item.bookId),
+    quantity: item.quantity,
+    price: item.price,
+    totalPrice: item.price * item.quantity,
   });
-  await orderItem.save();
+
+  // Update order
+  await Order.findByIdAndUpdate(orderId, {
+    $push: { orderItems: orderItem._id },
+    $inc: { totalPrice: orderItem.totalPrice },
+  });
+
   return orderItem;
 };
 
-// Get OrderItem by ID
-export const getOrderItemById = async (id: string) => {
-  return OrderItemModel.findById(id).populate("bookId");
-};
+// ✅ Export multiple order items function
+export const createMultipleOrderItems = async (
+  items: OrderItemInput[],
+  userId: string,
+  orderId?: string
+) => {
+  if (!items || items.length === 0) {
+    throw new Error("No order items provided");
+  }
 
-// Get all OrderItems for a specific order
-export const getOrderItemsByOrderId = async (orderId: string) => {
-  return OrderItemModel.find({ orderId }).populate("bookId");
-};
+  if (!orderId) {
+    const order = await Order.create({
+      userId: new mongoose.Types.ObjectId(userId),
+      totalPrice: 0,
+      orderItems: [],
+    });
+    orderId = order._id.toString();
+  }
 
-// Delete an OrderItem
-export const deleteOrderItem = async (id: string) => {
-  return OrderItemModel.findByIdAndDelete(id);
+  let totalOrderPrice = 0;
+  const createdItems = [];
+
+  for (const item of items) {
+    if (!item.bookId || item.quantity == null || item.price == null) {
+      throw new Error("Missing required fields in one of the order items");
+    }
+
+    const orderItem = await OrderItem.create({
+      orderId: new mongoose.Types.ObjectId(orderId),
+      bookId: new mongoose.Types.ObjectId(item.bookId),
+      quantity: item.quantity,
+      price: item.price,
+      totalPrice: item.price * item.quantity,
+    });
+
+    totalOrderPrice += orderItem.totalPrice;
+    createdItems.push(orderItem);
+  }
+
+  await Order.findByIdAndUpdate(orderId, {
+    $push: { orderItems: { $each: createdItems.map(i => i._id) } },
+    $inc: { totalPrice: totalOrderPrice },
+  });
+
+  return { orderId, createdItems, totalOrderPrice };
 };
