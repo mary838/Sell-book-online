@@ -1,5 +1,5 @@
 import { Router } from "express";
-import userRoute from "@/routes/userRoutes";
+import UserRouter from "@/routes/userRoutes";
 import AuthRoute from "./authRoutes";
 import bookRouter from "./bookRoutes";
 import categoryRoute from "./categoryRoute";
@@ -10,6 +10,12 @@ const router = Router();
 router.use("/order-items", orderItemRoute); // plural
 // Auth Route
 router.use("/", userRoute);
+
+// UAth Router
+router.use("/", UserRouter);
+router.use("/updated-user", UserRouter);
+router.use("/delete-user", UserRouter);
+router.use("/users/:id", UserRouter);
 
 router.use("/", bookRouter);
 router.use("/books", bookRouter);

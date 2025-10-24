@@ -2,20 +2,22 @@ import mongoose, { Types, Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
-  name: string;
+  full_name: string;
+  user_name: string;
   email: string;
   password: string;
-  phone?: number;
+  phone?: string;
   role: "user" | "admin";
   refreshToken: string;
 }
 
 const userSchema = new Schema<IUser>(
   {
-    name: { type: String, required: true },
+    full_name: { type: String, required: true },
+    user_name:  { type: String, required: true, unique: true},
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, unique: true },
-    phone: { type: Number },
+    phone: { type: String },
     role: {
       type: String,
       enum: ["user", "admin"],
@@ -26,6 +28,5 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-export const userModel = mongoose.model<IUser>("User", userSchema);
+export const userModel = mongoose.model<IUser>("User", userSchema); 
 
-export default userSchema;
