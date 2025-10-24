@@ -9,7 +9,7 @@ const router = Router();
 // Order Routes
 router.use("/order-items", orderItemRoute); // plural
 // Auth Route
-router.use("/", userRoute);
+
 
 // UAth Router
 router.use("/", UserRouter);
