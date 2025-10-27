@@ -1,31 +1,26 @@
 import { Router } from "express";
-import UserRouter from "@/routes/userRoutes";
-import AuthRoute from "./authRoutes";
+import AuthRouter from "./authRoutes";
 import bookRouter from "./bookRoutes";
+import userRouter from "./userRoutes";
 import categoryRoute from "./categoryRoute";
 import orderItemRoute from "./orderItemRoutes";
 import cartRoutes from "./cartRoutes";
 
 const router = Router();
-// Order Routes
-router.use("/order-items", orderItemRoute); // plural
-// Auth Route
 
-// UAth Router
-router.use("/", UserRouter);
-router.use("/updated-user", UserRouter);
-router.use("/delete-user", UserRouter);
-router.use("/users/:id", UserRouter);
+router.use("/", orderItemRoute);
+router.use("/", categoryRoute);
 
 router.use("/", bookRouter);
-router.use("/books", bookRouter);
-router.use("/create-book", bookRouter);
-router.use("/updated-book", bookRouter);
-router.use("/delete-book", bookRouter);
-router.use("/categories", categoryRoute);
-router.use("/", categoryRoute);
-router.use("/cart", cartRoutes);
+
 // Auth route
-router.use("/auth", AuthRoute);
+router.use("/auth", AuthRouter);
+
+// Users Routes
+router.use("/", userRouter);
+
+// Cart route
+router.use("/cart", cartRoutes);
 
 export default router;
+

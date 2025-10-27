@@ -1,13 +1,13 @@
 import { ObjectId } from 'mongoose';
 
 export interface IUser {
-  _id?: ObjectId;          // Mongoose ObjectId
-  firstName: string;
-  lastName: string;
-  userName: string;
+  _id?: ObjectId;        
+  full_name: string;
+  user_name: string;
   email: string;
   password: string;
-  roleId?: ObjectId | string; // can store either role ObjectId or string
+  roleId?: ObjectId | string;
+  role?: string;
   phone?: number;
   age?: number;
   isActive?: boolean;
@@ -15,15 +15,14 @@ export interface IUser {
   updatedAt?: Date;
 }
 export interface CreateUserInput {
-  firstName: string;
-  lastName: string;
-  userName: string;
+  full_name: string;
+  user_name: string;
   email: string;
   password: string;
   phone?: number;
   age?: number;
   roleId?: string;
-  data?: Partial<IUser>;   // optional extra data
+  data?: Partial<IUser>; 
 }
 export interface UserResult {
   success: boolean;

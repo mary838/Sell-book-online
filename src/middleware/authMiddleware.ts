@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { AuthUser } from "@/types/authType";
+import { AuthUser } from "@/types/auth-type";
 import { handleError } from "@/constant/handleError";
 
 declare global {
@@ -32,17 +32,18 @@ export const authMiddleware = (
 
     const decoded = jwt.verify(token, secret) as JwtPayload & AuthUser;
 
-    if (!decoded?.id || !decoded?.email || !decoded.role) {
-      return handleError(res, 400, "Invalid token");
-    }
+        if (!decoded?._id || !decoded?.email || !decoded.role) {
+            return handleError(res, 400, "Invalid token");
+        }
 
-    req.user = {
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role,
-    };
+        req.user = {
+            _id: decoded._id,
+            email: decoded.email,
+            role: decoded.role,
+        }
 
     next();
+    
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return handleError(
@@ -73,12 +74,21 @@ export const checkRoleMiddleware = (...allowedRoles: string[]) => {
         return handleError(res, 403, "Access forbidden.");
       }
 
-      next();
-    } catch (error) {
-      console.error(`[Role Middleware Error]`, error);
-      return handleError(res, 500, "Unexpected error occurred");
-      // Just kidding remove this when lunch production
-      // return handleError(res, 500, "I don't know. What's wrong?");
-    }
-  };
+            if (!req.user) {
+                return handleError(res, 401, "Unauthorized.")
+            }
+
+            // Check if role is allowed
+            if (!allowedRoles.includes(req.user.role)) {
+                return handleError(res, 403, "Access forbidden.")
+            }
+
+            
+            next();
+
+        } catch (error) {
+            console.error(error);
+            return handleError(res, 500, "Unexpected error occurred");
+        }
+    };
 };

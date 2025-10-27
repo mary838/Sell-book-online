@@ -6,7 +6,7 @@ import {
   updateCategoryService,
   deleteCategoryService,
 } from "@/service/categoryService";
-import { CreateCategoryInput } from "@/types/category";
+import { CreateCategoryInput } from "@/types/category-type";
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
