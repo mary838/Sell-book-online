@@ -7,10 +7,11 @@ import jwt from "jsonwebtoken";
 
 export const registerService = async (req: Request, res: Response) => {
   try {
-    const { full_name, user_name, email, password, role } = req.body;
+    const { name, email, password, role } = req.body;
 
-    // Check if user already exists
+    // Check exist User
     const existingUser = await userModel.findOne({ email });
+
     if (existingUser) {
       return handleError(res, 401, "User already exists");
     }
@@ -18,10 +19,8 @@ export const registerService = async (req: Request, res: Response) => {
     // Hash password
     const hashPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const newUser = new userModel({
-      full_name,
-      user_name,
+      name,
       email,
       password: hashPassword,
       role: role || "user",
@@ -29,44 +28,22 @@ export const registerService = async (req: Request, res: Response) => {
 
     await newUser.save();
 
-    // Generate access and refresh tokens
-    const { accessToken, refreshToken } = generateTokens(
-      newUser._id.toString(),
+    const token = generateTokens(
+      newUser.id.toString(),
       newUser.email,
       newUser.role || "user"
     );
 
-    // store refresh token in DB
-    newUser.refreshToken = refreshToken;
-    await newUser.save();
-
-    // Send refresh token as HttpOnly cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    // Send access token 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, 
-    });
-
     return res.status(201).json({
       message: "User registered successfully",
-      accessToken,
       data: {
         user: {
           id: newUser.id,
-          full_name: newUser.full_name,
-          user_name: newUser.user_name,
+          name: newUser.user_name,
           email: newUser.email,
-          role: newUser.role,
+          role: newUser.role || "user",
         },
+        token,
       },
     });
   } catch (error) {
@@ -74,8 +51,6 @@ export const registerService = async (req: Request, res: Response) => {
     return handleError(res, 500, "An error occurred during registration");
   }
 };
-
-
 
 export const loginService = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -86,7 +61,10 @@ export const loginService = async (req: Request, res: Response) => {
       return handleError(res, 400, "Invalid credentials");
     }
 
-    const isValidPassword = await bcrypt.compare(password, existingUser.password);
+    const isValidPassword = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
     if (!isValidPassword) {
       return handleError(res, 400, "Invalid credentials");
     }
@@ -109,12 +87,12 @@ export const loginService = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    // Send access token 
+    // Send access token
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 15 * 60 * 1000, 
+      maxAge: 15 * 60 * 1000,
     });
 
     return res.status(200).json({
@@ -141,8 +119,7 @@ export const logoutService = async (req: Request, res: Response) => {
     if (refreshToken) {
       const findUser = await userModel.findOne({ refreshToken });
       if (findUser) {
-        findUser.refreshToken = "",
-        await findUser.save();  
+        (findUser.refreshToken = ""), await findUser.save();
       }
     }
 
@@ -150,37 +127,39 @@ export const logoutService = async (req: Request, res: Response) => {
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
-    })
+    });
 
     return res.status(200).json({ message: "Logged out successfully" });
-
   } catch (error) {
     console.error("Logout error:", error);
     return handleError(res, 500, "False to logout");
-  };
+  }
 };
 
 export const refreshTokenService = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
-    if(!refreshToken) {
-      return handleError(res, 401, "No refresh token provided.")
+    if (!refreshToken) {
+      return handleError(res, 401, "No refresh token provided.");
     }
 
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string) as { id: string };
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET as string
+    ) as { id: string };
 
     const user = await userModel.findById(decoded.id);
-    if(!user || user.refreshToken !== refreshToken) {
-      return handleError(res, 403, "Invalid refresh token.")
+    if (!user || user.refreshToken !== refreshToken) {
+      return handleError(res, 403, "Invalid refresh token.");
     }
 
     // Generate new token
-    const {accessToken, refreshToken: newRefreshToken} = generateTokens(
-      user._id.toString(), 
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(
+      user._id.toString(),
       user.email,
-      user.role,
-    )
+      user.role
+    );
 
     // Update refresh token
     user.refreshToken = newRefreshToken;
@@ -194,21 +173,20 @@ export const refreshTokenService = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Send access token 
+    // Send access token
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 15 * 60 * 1000, 
+      maxAge: 15 * 60 * 1000,
     });
 
     return res.status(200).json({
       success: true,
       accessToken,
-    })
-
+    });
   } catch (error) {
     console.error(error);
-   return handleError(res, 403, "Token expired or invalid");
+    return handleError(res, 403, "Token expired or invalid");
   }
-}
+};

@@ -1,54 +1,55 @@
-import { Request, Response, NextFunction} from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { AuthUser } from "@/types/authType";
 import { handleError } from "@/constant/handleError";
 
-
 declare global {
-    namespace Express {
-       interface Request {
-           user?: AuthUser
-       }
+  namespace Express {
+    interface Request {
+      user?: AuthUser;
     }
+  }
 }
 
 export const authMiddleware = (
-    req: Request,
-    res: Response,
-    next: NextFunction,
+  req: Request,
+  res: Response,
+  next: NextFunction
 ): void | Response => {
-    try {
-        const authHeader = req.headers.authorization;
+  try {
+    const authHeader = req.headers.authorization;
 
-        if (!authHeader?.startsWith("Bearer ")) {
-            return handleError(res, 401, "Unauthorized");
-        }
+    if (!authHeader?.startsWith("Bearer ")) {
+      return handleError(res, 401, "Unauthorized");
+    }
 
-        const token = authHeader?.split(" ")[1]
-        const secret = process.env.JWT_ACCESS_SECRET;
+    const token = authHeader?.split(" ")[1];
+    const secret = process.env.JWT_ACCESS_SECRET;
 
-        if (!secret) {
-            return handleError(res, 401, "Unauthorized");
-        }
+    if (!secret) {
+      return handleError(res, 401, "Unauthorized");
+    }
 
-        const decoded = jwt.verify(token, secret) as JwtPayload & AuthUser;
+    const decoded = jwt.verify(token, secret) as JwtPayload & AuthUser;
 
-        if (!decoded?.id || !decoded?.email || !decoded.role) {
-            return handleError(res, 400, "Invalid token");
-        }
+    if (!decoded?.id || !decoded?.email || !decoded.role) {
+      return handleError(res, 400, "Invalid token");
+    }
 
-        req.user = {
-            id: decoded.id,
-            email: decoded.email,
-            role: decoded.role,
-        }
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
+    };
 
-        next();
-
-    } catch (error) {
-
+    next();
+  } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      return handleError(res, 401, "Access token expired. Please refresh your token.");
+      return handleError(
+        res,
+        401,
+        "Access token expired. Please refresh your token."
+      );
     }
 
     if (error instanceof jwt.JsonWebTokenError) {
@@ -61,28 +62,23 @@ export const authMiddleware = (
 };
 
 export const checkRoleMiddleware = (...allowedRoles: string[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user) {
+        return handleError(res, 401, "Unauthorized.");
+      }
 
-    return async (req: Request, res: Response, next: NextFunction) => {
-        try {
+      // Check if role is allowed
+      if (!allowedRoles.includes(req.user.role)) {
+        return handleError(res, 403, "Access forbidden.");
+      }
 
-            if (!req.user) {
-                return handleError(res, 401, "Unauthorized.")
-            }
-
-            // Check if role is allowed
-            if (!allowedRoles.includes(req.user.role)) {
-                return handleError(res, 403, "Access forbidden.")
-            }
-
-            
-            next();
-
-        } catch (error) {
-            console.error(`[Role Middleware Error]`, error);
-            return handleError(res, 500, "Unexpected error occurred");
-            // Just kidding remove this when lunch production
-            // return handleError(res, 500, "I don't know. What's wrong?");
-        }
-    };
+      next();
+    } catch (error) {
+      console.error(`[Role Middleware Error]`, error);
+      return handleError(res, 500, "Unexpected error occurred");
+      // Just kidding remove this when lunch production
+      // return handleError(res, 500, "I don't know. What's wrong?");
+    }
+  };
 };
-
