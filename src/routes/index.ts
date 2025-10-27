@@ -4,6 +4,7 @@ import bookRouter from "./bookRoutes";
 import userRouter from "./userRoutes";
 import categoryRoute from "./categoryRoute";
 import orderItemRoute from "./orderItemRoutes";
+import cartRoutes from "./cartRoutes";
 
 const router = Router();
 
@@ -17,6 +18,9 @@ router.use("/auth", AuthRouter);
 
 // Users Routes
 router.use("/", userRouter);
+
+// Cart route
+router.use("/cart", cartRoutes);
 
 export default router;
 
