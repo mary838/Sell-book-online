@@ -61,7 +61,7 @@ export const registerService = async (req: Request, res: Response) => {
       accessToken,
       data: {
         user: {
-          id: newUser.id,
+          _id: newUser._id,
           full_name: newUser.full_name,
           user_name: newUser.user_name,
           email: newUser.email,
@@ -78,61 +78,55 @@ export const registerService = async (req: Request, res: Response) => {
 
 
 export const loginService = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+    const { email, password } = req.body;
 
-  try {
-    const existingUser = await userModel.findOne({ email });
-    if (!existingUser) {
-      return handleError(res, 400, "Invalid credentials");
+    try {
+        const existUser = await userModel.findOne({ email });
+        if (!existUser) {
+            return handleError(res, 400, "Invalid credentials");
+        }
+
+        const isValidPassword = await bcrypt.compare(password, existUser.password);
+        if (!isValidPassword) {
+            return handleError(res, 400, "Invalid credentials");
+        }
+
+        const { accessToken, refreshToken } = generateTokens(
+            existUser._id.toString(),
+            existUser.email,
+            existUser.role
+        );
+
+        // Save refresh token in DB
+        existUser.refreshToken = refreshToken;
+        await existUser.save();
+
+        // Send refresh token as HttpOnly cookie
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
+        return res.status(200).json({
+            message: "Login Successful",
+            accessToken,
+            data: {
+                user: {
+                    _id: existUser._id,
+                    full_name: existUser.full_name,
+                    user_name: existUser.user_name,
+                    email: existUser.email,
+                    phone: existUser.phone,
+                    role: existUser.role,
+                },
+            },
+        });
+    } catch (error) {
+        console.error("Login Service Error:", error);
+        return handleError(res, 500, "Login failed. Please try again later.");
     }
-
-    const isValidPassword = await bcrypt.compare(password, existingUser.password);
-    if (!isValidPassword) {
-      return handleError(res, 400, "Invalid credentials");
-    }
-
-    const { accessToken, refreshToken } = generateTokens(
-      existingUser._id.toString(),
-      existingUser.email,
-      existingUser.role
-    );
-
-    // Save refresh token in DB
-    existingUser.refreshToken = refreshToken;
-    await existingUser.save();
-
-    // Send refresh token as HttpOnly cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    // Send access token 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, 
-    });
-
-    return res.status(200).json({
-      message: "Login Successful",
-      accessToken,
-      data: {
-        user: {
-          id: existingUser._id,
-          full_name: existingUser.full_name,
-          email: existingUser.email,
-          role: existingUser.role,
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Login Service Error:", error);
-    return handleError(res, 500, "Login failed. Please try again later.");
-  }
 };
 
 export const logoutService = async (req: Request, res: Response) => {

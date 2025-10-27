@@ -1,41 +1,40 @@
-import { Router }from "express";
-import { 
-  authMiddleware, 
-  checkRoleMiddleware 
+import { Router } from "express";
+import {
+  authMiddleware,
+  checkRoleMiddleware,
 } from "@/middleware/authMiddleware";
-
-import { 
-  createBookController, 
-  getBookController, 
-  updatedBookController, 
-  deleteBookController, 
-  getBookByIdController 
+import {
+  createBookController,
+  getBookController,
+  getBookByIdController,
+  updatedBookController,
+  deleteBookController,
 } from "@/controller/bookController";
 
 const bookRouter = Router();
 
+// Admin-only routes
 bookRouter.post(
-  "/create-book",
+  "/create-books",
   authMiddleware,
   checkRoleMiddleware("admin"),
   createBookController
 );
-
 bookRouter.put(
-  "/update-book/:id",
+  "/updated-books/:id",
   authMiddleware,
   checkRoleMiddleware("admin"),
   updatedBookController
 );
-
 bookRouter.delete(
-  "/delete-book/:id",
+  "/deleted-books/:id",
   authMiddleware,
   checkRoleMiddleware("admin"),
   deleteBookController
 );
 
-bookRouter.get("/books/:id", authMiddleware, getBookByIdController);
-bookRouter.get("/books",authMiddleware, getBookController);
+// Public routes
+bookRouter.get("/books", getBookController);
+bookRouter.get("/books/:id", getBookByIdController);
 
 export default bookRouter;

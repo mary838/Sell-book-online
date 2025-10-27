@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction} from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { AuthUser } from "@/types/authType";
+import { AuthUser } from "@/types/auth-type";
 import { handleError } from "@/constant/handleError";
 
 
@@ -33,12 +33,12 @@ export const authMiddleware = (
 
         const decoded = jwt.verify(token, secret) as JwtPayload & AuthUser;
 
-        if (!decoded?.id || !decoded?.email || !decoded.role) {
+        if (!decoded?._id || !decoded?.email || !decoded.role) {
             return handleError(res, 400, "Invalid token");
         }
 
         req.user = {
-            id: decoded.id,
+            _id: decoded._id,
             email: decoded.email,
             role: decoded.role,
         }
@@ -78,10 +78,8 @@ export const checkRoleMiddleware = (...allowedRoles: string[]) => {
             next();
 
         } catch (error) {
-            console.error(`[Role Middleware Error]`, error);
+            console.error(error);
             return handleError(res, 500, "Unexpected error occurred");
-            // Just kidding remove this when lunch production
-            // return handleError(res, 500, "I don't know. What's wrong?");
         }
     };
 };

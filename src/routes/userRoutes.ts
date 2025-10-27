@@ -1,34 +1,45 @@
 import { Router } from "express";
-import { getUsersController  , deleteUserController , updateUserController , getUserByIdController  } from "@/controller/userController";
-import { authMiddleware, checkRoleMiddleware } from "@/middleware/authMiddleware";
+import {
+  getUsersController,
+  getUserByIdController,
+  updateUserController,
+  deleteUserController,
+  getMeController,
+} from "@/controller/userController";
+import {
+  authMiddleware,
+  checkRoleMiddleware,
+} from "@/middleware/authMiddleware";
 
-const UserRouter = Router();
-// GET /api/v1/users
-UserRouter.get("/users", 
-    authMiddleware, 
-    checkRoleMiddleware("admin"), 
-    getUsersController
+const userRouter = Router();
+
+// Admin-only routes
+userRouter.get(
+  "/users",
+  authMiddleware,
+  checkRoleMiddleware("admin"),
+  getUsersController
 );
-// DELETE /api/v1/users/:id
-UserRouter.delete("/delete-user/:id", 
-    authMiddleware, 
-    checkRoleMiddleware("admin"),
-    deleteUserController
+userRouter.get(
+  "/users/:id",
+  authMiddleware,
+  checkRoleMiddleware("admin"),
+  getUserByIdController
 );
-// Update User By Id
-UserRouter.put("/updated-user/:id",
-    authMiddleware, 
-    checkRoleMiddleware("admin"),
-    updateUserController
+userRouter.put(
+  "/updated-users/:id",
+  authMiddleware,
+  checkRoleMiddleware("admin"),
+  updateUserController
 );
-// Get User By Id
-UserRouter.get("/users/:id" ,
-    authMiddleware, 
-    checkRoleMiddleware("admin"),
-    getUserByIdController
+userRouter.delete(
+  "/deleted-users/:id",
+  authMiddleware,
+  checkRoleMiddleware("admin"),
+  deleteUserController
 );
 
+// User self-profile route (optional)
+userRouter.get("/users/profile/me", authMiddleware, getMeController);
 
-
-
-export default UserRouter;
+export default userRouter;

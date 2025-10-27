@@ -1,82 +1,25 @@
 import { Request, Response } from "express";
 import { userModel } from "@/models/userModel";
+import { handleError } from "@/constant/handleError";
 
 export const getUserService = async (req: Request, res: Response) => {
-  try {
-    const users = await userModel.find();
-    res.status(200).json({
-      success: true,
-      data: users,
-      message: "Users fetched successfully",
-    });
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({
-      success: false,
-      data: [],
-      message: "Error fetching users",
-    });
-  }
-};
+    try {
+        const userData = req.body;
+        const user = await userModel.find({userData});
+        if (!user) {
+            return handleError(res, 404, "user not found");
+        }
 
-//Update user  By Id
-export const updateUserService = async (id: string, updateData: any) => {
-  try {
-    // Pass the update data and { new: true } to return the updated document
-    const updatedUser = await userModel.findByIdAndUpdate(id, updateData, { new: true });
+        res.status(200).json({
+            message: "Get user successfully",
+            data: user,
+        })
 
-    if (!updatedUser) {
-      return {
-        success: false,
-        data: null,
-        message: "User not found",
-      };
+    } catch (error) {
+        console.error(error);
+        return handleError(res, 500, "Failed to fetch user.");
     }
-
-    return {
-      success: true,
-      data: updatedUser,
-      message: "User updated successfully",
-    };
-  } catch (error) {
-    console.error("Error updating user:", error);
-    return {
-      success: false,
-      data: null,
-      message: "Internal server error while updating user",
-    };
-  }
-};
-
-// Delete User By Id
-export const deleteUserService = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const deletedUser = await userModel.findByIdAndDelete(id);
-
-    if (!deletedUser) {
-      return res.status(404).json({
-        success: false,
-        data: null,
-        message: "User not found",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      data: null, 
-      message: "User deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    return res.status(500).json({
-      success: false,
-      data: null,
-      message: "Internal server error while deleting user",
-    });
-  }
-};
-
+}
 
 // Get User By Id
 export const getUserByIdService = async (req: Request, res: Response) => {
@@ -97,3 +40,77 @@ export const getUserByIdService = async (req: Request, res: Response) => {
 };
 
 
+
+
+//Update user  By Id
+export const updateUserService = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    const updatedUser = await userModel.findByIdAndUpdate( id, updateData, {
+      new: true,
+      runValidators: true,
+    })
+
+    if (!updatedUser) {
+      return handleError(res, 404, "User not found");
+    }
+
+    return res.status(200).json({
+      message: "Updated user successfully",
+      data: updatedUser,
+    })
+
+  } catch (error) {
+    console.error(error);
+    return handleError(res, 500, "Failed to update user");
+  }
+}
+
+// Delete User By Id
+export const deleteUserService = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const deletedUser = await userModel.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "User deleted successfully",
+    });
+    
+  } catch (error) {
+    console.error("Error deleting user:", error);
+   return handleError(res, 500, "Failed to delete user");
+  }
+};
+
+// Get me service
+export const getMeService = async (req: Request, res: Response) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return handleError(res, 401, "Unauthorized");
+    }
+
+    const userProfile = await userModel.findById(req.user._id).select("-password");
+
+    if (!userProfile) {
+      return handleError(res, 404, "User profile not found.");
+    }
+
+    return res.status(200).json({
+      message: "User profile fetched successfully.",
+      data: userProfile,
+    })
+
+  } catch (error) {
+    console.error(error);
+    return handleError(res, 500, "Failed to fetch user profile.");
+  }
+}

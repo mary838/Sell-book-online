@@ -5,6 +5,6 @@ import { authMiddleware } from "@/middleware/authMiddleware";
 const router = express.Router();
 
 // POST /api/order-item/bulk
-router.post("/", authMiddleware, createMultipleOrderItemsController);
+router.post("/order-items", authMiddleware, createMultipleOrderItemsController);
 
 export default router;
