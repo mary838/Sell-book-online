@@ -1,41 +1,32 @@
-import { cartModel } from "@/models/cartModel";
-import ICartItem from "@/types/cartType";
-import "@/models/bookModel";
+import CartModel from "@/models/cartModel";
+import mongoose from "mongoose";
 
-export const getCartService = async (userId: string) => {
-  const cart = await cartModel.findOne({ userId }).populate("items.productId");
-
+// find or create a cart by user ID
+export const findOrCreateCart = async (userId: string) => {
+  let cart = await CartModel.findOne({ user: userId }).populate("items");
   if (!cart) {
-    return { success: false, message: "Cart not found", data: null };
+    cart = await CartModel.create({ user: userId, items: [], totalAmount: 0 });
   }
-  return { success: true, data: cart };
+  return cart;
 };
 
-export const addItemToCartService = async (userId: string, item: ICartItem) => {
-  let cart = await cartModel.findOne({ userId });
+// get cart by ID
+export const getCartById = async (cartId: string) => {
+  const cart = await CartModel.findById(cartId).populate("items");
+  if (!cart) throw new Error("Cart not found");
+  return cart;
+};
 
-  if (!cart) {
-    cart = new cartModel({
-      userId,
+// recalculate total amount
+export const updateCartTotal = async (cartId: string) => {
+  const cart = await CartModel.findById(cartId).populate("items");
+  if (!cart) throw new Error("Cart not found");
 
-      items: [item],
-      totalPrice: item.price * item.quantity,
-    });
-  } else {
-    const existingItem = cart.items.find(
-      (i) => i.productId.toString() === item.productId.toString()
-    );
-    if (existingItem) {
-      existingItem.quantity += item.quantity;
-    } else {
-      cart.items.push(item);
-    }
-    cart.totalPrice = cart.items.reduce(
-      (sum, i) => sum + i.price * i.quantity,
-      0
-    );
-  }
-
+  const total = cart.items.reduce(
+    (sum: number, item: any) => sum + item.price * item.quantity,
+    0
+  );
+  cart.totalAmount = total;
   await cart.save();
-  return { success: true, data: cart };
+  return cart;
 };
