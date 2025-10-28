@@ -6,8 +6,13 @@ import {
   updateCategoryService,
   deleteCategoryService,
 } from "@/service/categoryService";
+<<<<<<< HEAD
 import { CreateCategoryInput } from "@/types/category";
 // create category
+=======
+import { CreateCategoryInput } from "@/types/category-type";
+
+>>>>>>> 0baf21ac58c21d5b57ede4603d9790403df2f232
 export const createCategory = async (req: Request, res: Response) => {
   try {
     const categoryData: CreateCategoryInput = req.body;

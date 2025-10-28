@@ -1,11 +1,20 @@
-import {CategoryModel} from "../models/category";
-import { CategoryResult, CreateCategoryInput } from "@/types/category";
+import {categoryModel} from "../models/categoryModel";
+import { CategoryResult, CreateCategoryInput } from "@/types/category-type";
 
 export const createCategoryService = async (
   categoryData: CreateCategoryInput
 ): Promise<CategoryResult> => {
   try {
-    const category = new CategoryModel(categoryData);
+    // Check exising category
+    const existingCategory = await categoryModel.findOne({ name: categoryData.name });
+    if (existingCategory) {
+      return {
+        success: false,
+        data: null,
+        message: "Category already exists",
+      };
+    }
+    const category = new categoryModel(categoryData);
     const saved = await category.save();
     return {
       success: true,
@@ -20,7 +29,7 @@ export const createCategoryService = async (
 
 export const getAllCategoriesService = async (): Promise<CategoryResult> => {
   try {
-    const categories = await CategoryModel.find().populate(
+    const categories = await categoryModel.find().populate(
       "createdBy",
       "username email"
     );
@@ -34,7 +43,7 @@ export const getCategoryByIdService = async (
   id: string
 ): Promise<CategoryResult> => {
   try {
-    const category = await CategoryModel.findById(id).populate(
+    const category = await categoryModel.findById(id).populate(
       "createdBy",
       "username email"
     );
@@ -51,7 +60,7 @@ export const updateCategoryService = async (
   updates: Partial<CreateCategoryInput>
 ): Promise<CategoryResult> => {
   try {
-    const updated = await CategoryModel.findByIdAndUpdate(id, updates, {
+    const updated = await categoryModel.findByIdAndUpdate(id, updates, {
       new: true,
     });
     if (!updated)
@@ -70,7 +79,7 @@ export const deleteCategoryService = async (
   id: string
 ): Promise<CategoryResult> => {
   try {
-    const deleted = await CategoryModel.findByIdAndDelete(id);
+    const deleted = await categoryModel.findByIdAndDelete(id);
     if (!deleted)
       return { success: false, data: null, message: "Category not found" };
     return {

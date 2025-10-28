@@ -6,13 +6,17 @@ import {
   updateCategory,
   deleteCategory,
 } from "@/controller/categoryController";
+import { authMiddleware, checkRoleMiddleware } from "@/middleware/authMiddleware";
 
-const router = Router();
+const categorieyRouter = Router();
 
-router.post("/", createCategory);
-router.get("/", getCategories);
-router.get("/:id", getCategoryById);
-router.put("/:id", updateCategory);
-router.delete("/:id", deleteCategory);
+// Protected routes (require authentication)
+categorieyRouter.post("/create-categories", authMiddleware, checkRoleMiddleware("admin"), createCategory);
+categorieyRouter.put("/updated-categories/:id", authMiddleware, checkRoleMiddleware("admin"), updateCategory);
+categorieyRouter.delete("/deleted-categories/:id", authMiddleware, checkRoleMiddleware("admin"), deleteCategory);
 
-export default router;
+// Public routes
+categorieyRouter.get("/categories", authMiddleware, checkRoleMiddleware("admin"), getCategories);
+categorieyRouter.get("/categories/:id", authMiddleware, checkRoleMiddleware("admin"), getCategoryById);
+
+export default categorieyRouter;

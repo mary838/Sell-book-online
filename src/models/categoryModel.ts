@@ -1,17 +1,15 @@
 import mongoose, { Schema } from "mongoose";
-import { ICategory } from "@/types/category";
+import { ICategory } from "@/types/category-type";
 
 const categorySchema = new Schema(
   {
     name: {
       type: String,
       required: true,
-      trim: true,
       unique: true,
     },
     description: {
       type: String,
-      trim: true,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,6 +20,6 @@ const categorySchema = new Schema(
   { timestamps: true }
 );
 
-export const CategoryModel = mongoose.model<ICategory>("Category", categorySchema);
+export const categoryModel = mongoose.model<ICategory>("Category", categorySchema);
 
 
