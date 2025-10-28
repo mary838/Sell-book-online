@@ -1,10 +1,10 @@
 import express from "express";
-import { createMultipleOrderItemsController } from "@/controller/orderItemController";
+import { createOrderFromCartController } from "@/controller/orderItemController";
 import { authMiddleware } from "@/middleware/authMiddleware";
 
 const router = express.Router();
 
-// POST /api/order-item/bulk
-router.post("/order-items", authMiddleware, createMultipleOrderItemsController);
+// POST /api/order-item
+router.post("/order-from-cart", authMiddleware, createOrderFromCartController);
 
 export default router;

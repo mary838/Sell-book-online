@@ -32,19 +32,6 @@ export const authMiddleware = (
 
     const decoded = jwt.verify(token, secret) as JwtPayload & AuthUser;
 
-<<<<<<< HEAD
-    if (!decoded?.id || !decoded?.email || !decoded.role) {
-      return handleError(res, 400, "Invalid token");
-    }
-
-    req.user = {
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role,
-    };
-
-    next();
-=======
         if (!decoded?._id || !decoded?.email || !decoded.role) {
             return handleError(res, 400, "Invalid token");
         }
@@ -57,7 +44,6 @@ export const authMiddleware = (
 
     next();
     
->>>>>>> 0baf21ac58c21d5b57ede4603d9790403df2f232
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return handleError(
@@ -97,16 +83,6 @@ export const checkRoleMiddleware = (...allowedRoles: string[]) => {
         return handleError(res, 403, "Access forbidden.");
       }
 
-<<<<<<< HEAD
-      next();
-    } catch (error) {
-      console.error(`[Role Middleware Error]`, error);
-      return handleError(res, 500, "Unexpected error occurred");
-      // Just kidding remove this when lunch production
-      // return handleError(res, 500, "I don't know. What's wrong?");
-    }
-  };
-=======
             
             next();
 
@@ -115,5 +91,4 @@ export const checkRoleMiddleware = (...allowedRoles: string[]) => {
             return handleError(res, 500, "Unexpected error occurred");
         }
     };
->>>>>>> 0baf21ac58c21d5b57ede4603d9790403df2f232
 };
