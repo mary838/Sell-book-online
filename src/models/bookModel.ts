@@ -14,9 +14,8 @@ const bookSchema = new Schema(
       trim: true,
     },
     author: {
-      type: String,
-      required: true,
-      trim: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Author",
     },
     publisher: {
       type: String,
@@ -31,7 +30,6 @@ const bookSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     },
-
     stock: {
       type: Number,
       default: 0,

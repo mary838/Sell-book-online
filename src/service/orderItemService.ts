@@ -1,6 +1,6 @@
-import { OrderItem } from "@/models/orderItemModel";
-import { Order } from "@/models/orderModel";
-import CartItemModel from "@/models/cartIteamModel";
+import { OrderItemModel } from "@/models/orderItemModel";
+import { OrderModel } from "@/models/orderModel";
+import {cartItemModel} from "@/models/cartIteamModel";
 import mongoose from "mongoose";
 
 
@@ -8,14 +8,14 @@ import mongoose from "mongoose";
 
 export const createOrderFromCart = async (userId: string, orderId?: string) => {
   // Get all cart items for this user
-  const cartItems = await CartItemModel.find({}).lean(); // Optional: filter by userId if added to schema
+  const cartItems = await cartItemModel.find({}).lean(); // Optional: filter by userId if added to schema
   if (!cartItems || cartItems.length === 0) {
     throw new Error("Cart is empty");
   }     
 
   // Create order if orderId not provided
   if (!orderId) {
-    const order = await Order.create({
+    const order = await OrderModel.create({
       userId: new mongoose.Types.ObjectId(userId),
       totalPrice: 0,
       orderItems: [],
@@ -27,7 +27,7 @@ export const createOrderFromCart = async (userId: string, orderId?: string) => {
   const createdItems = [];
 
   for (const cartItem of cartItems) {
-    const orderItem = await OrderItem.create({
+    const orderItem = await OrderItemModel.create({
       orderId: new mongoose.Types.ObjectId(orderId),
       bookId: new mongoose.Types.ObjectId(cartItem.book),
       quantity: cartItem.quantity,
@@ -41,7 +41,7 @@ export const createOrderFromCart = async (userId: string, orderId?: string) => {
 
 
   // Optional: clear cart after creating order
-  await CartItemModel.deleteMany({});
+  await cartItemModel.deleteMany({});
 
   return { orderId, createdItems, totalOrderPrice };
 };

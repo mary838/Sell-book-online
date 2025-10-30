@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 
 export const registerService = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { full_name, user_name, email, password, role } = req.body;
 
     // Check exist User
     const existingUser = await userModel.findOne({ email });
@@ -20,7 +20,8 @@ export const registerService = async (req: Request, res: Response) => {
     const hashPassword = await bcrypt.hash(password, 10);
 
     const newUser = new userModel({
-      name,
+      full_name,
+      user_name,
       email,
       password: hashPassword,
       role: role || "user",

@@ -33,4 +33,4 @@ const cartSchema = new Schema<ICart>(
   }
 );
 
-export default mongoose.model<ICart>("Cart", cartSchema);
+export const cartModel = mongoose.model<ICart>("Cart", cartSchema);
