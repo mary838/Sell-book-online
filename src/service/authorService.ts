@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AuthorSchema } from "@/models/Author";
+import { authorModel } from "@/models/authorModel";
 import { handleError } from "@/constant/handleError";
 
 
@@ -9,18 +9,18 @@ export const createAuthorService = async (req: Request, res: Response) => {
 try{
     const { name, phone, dob } = req.body;
 // for take data from body name phone dob
-    const existingAuthor = await AuthorSchema.findOne({ $or: [ { name }, { phone } ] });
+    const existingAuthor = await authorModel.findOne({ $or: [ { name }, { phone } ] });
 // check existing author by name or phone
     if (existingAuthor) {
         return handleError(res, 400, "Author with the same name or phone already exists.");
     }
 // have name or phone already exists. return handleError(res, 400, "Author with the same name or phone already exists.");
-    const newAuthor = new AuthorSchema({
+    const newAuthor = new authorModel({
         name,
         phone,
         dob,
     });
-// create new author use AuthorSchema
+// create new author use authorModel
 
     const savedAuthor = await newAuthor.save();
 // save new author to database
@@ -50,7 +50,7 @@ export const getAuthorService = async (req: Request, res: Response) => {
 
         const authorData = req.body;
 // use for set data from body like name  phone dob
-        const author = await AuthorSchema.find({authorData});
+        const author = await authorModel.find({authorData});
 // use  await wait find all database from authorData and use AuthorSchma for take Model   
         if (!author) {
             return handleError(res, 404, "Author not found");
@@ -74,7 +74,7 @@ export const updateAuthorService = async (req: Request, res: Response) => {
         const authorId = req.params.id;
         const updateData = req.body;
 // id for param and update date in body
-        const updatedAuthor = await AuthorSchema.findByIdAndUpdate(
+        const updatedAuthor = await authorModel.findByIdAndUpdate(
             authorId,
             updateData,
             { new: true }
@@ -100,7 +100,7 @@ export const deleteAuthorService = async (req: Request, res: Response) => {
     try {
         const authorId = req.params.id;
 // take id from param
-        const deletedAuthor = await AuthorSchema.findByIdAndDelete(authorId);
+        const deletedAuthor = await authorModel.findByIdAndDelete(authorId);
 // findByIdAndDelete for delete author by id
         if (!deletedAuthor) {
             return handleError(res, 404, "Author not found");
@@ -120,7 +120,7 @@ export const deleteAuthorService = async (req: Request, res: Response) => {
 //get all authors service
 export const getAllAuthorsService = async (req: Request, res: Response) => {
     try {
-        const authors = await AuthorSchema.find();
+        const authors = await authorModel.find();
 // find for get all authors from database
         res.status(200).json({
             message: "Authors fetched successfully",

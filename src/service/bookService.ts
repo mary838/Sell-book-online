@@ -54,7 +54,7 @@ export const createBookService = async (req: Request, res: Response) => {
         }
 
         // Find category by name and get its ObjectId
-        const foundCategory = await categoryModel.findOne({ name: category });
+        const foundCategory = await categoryModel.findOne({ name });
         if (!foundCategory) {
             return handleError(res, 404, "Category not found.");
         }

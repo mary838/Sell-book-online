@@ -1,3 +1,4 @@
+import { time } from "console";
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ICartItem extends Document {
@@ -23,6 +24,6 @@ const cartItemSchema = new Schema<ICartItem>({
     required: true,
     min: 0,
   },
-});
+}, {timestamps: true });
 
-export default mongoose.model<ICartItem>("CartItem", cartItemSchema);
+export const cartItemModel = mongoose.model<ICartItem>("CartItem", cartItemSchema);
