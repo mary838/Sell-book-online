@@ -5,8 +5,12 @@ import userRouter from "./userRoutes";
 import categoryRoute from "./categoryRoute";
 import orderItemRoute from "./orderItemRoutes";
 import cartRoutes from "./cartRoutes";
+import AuthorRouter from "./authorRoute";
 
 const router = Router();
+
+// Author route
+router.use("/", AuthorRouter);
 
 router.use("/", orderItemRoute);
 router.use("/", categoryRoute);

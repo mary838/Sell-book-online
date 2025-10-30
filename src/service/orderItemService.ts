@@ -1,56 +1,19 @@
 import { OrderItem } from "@/models/orderItemModel";
 import { Order } from "@/models/orderModel";
+import CartItemModel from "@/models/cartIteamModel";
 import mongoose from "mongoose";
 
-interface OrderItemInput {
-  bookId: string;
-  quantity: number;
-  price: number;
-}
 
-// Single order item creation (optional)
-export const createOrderItemAuto = async (item: OrderItemInput, userId: string, orderId?: string) => {
-  if (!item.bookId || item.quantity == null || item.price == null) {
-    throw new Error("Missing required fields for OrderItem");
-  }
+ // Create order from cart items
 
-  // Create order if not provided
-  if (!orderId) {
-    const order = await Order.create({
-      userId: new mongoose.Types.ObjectId(userId),
-      totalPrice: 0,
-      orderItems: [],
-    });
-    orderId = order._id.toString();
-  }
+export const createOrderFromCart = async (userId: string, orderId?: string) => {
+  // Get all cart items for this user
+  const cartItems = await CartItemModel.find({}).lean(); // Optional: filter by userId if added to schema
+  if (!cartItems || cartItems.length === 0) {
+    throw new Error("Cart is empty");
+  }     
 
-  const orderItem = await OrderItem.create({
-    orderId: new mongoose.Types.ObjectId(orderId),
-    bookId: new mongoose.Types.ObjectId(item.bookId),
-    quantity: item.quantity,
-    price: item.price,
-    totalPrice: item.price * item.quantity,
-  });
-
-  // Update order
-  await Order.findByIdAndUpdate(orderId, {
-    $push: { orderItems: orderItem._id },
-    $inc: { totalPrice: orderItem.totalPrice },
-  });
-
-  return orderItem;
-};
-
-// ✅ Export multiple order items function
-export const createMultipleOrderItems = async (
-  items: OrderItemInput[],
-  userId: string,
-  orderId?: string
-) => {
-  if (!items || items.length === 0) {
-    throw new Error("No order items provided");
-  }
-
+  // Create order if orderId not provided
   if (!orderId) {
     const order = await Order.create({
       userId: new mongoose.Types.ObjectId(userId),
@@ -63,27 +26,22 @@ export const createMultipleOrderItems = async (
   let totalOrderPrice = 0;
   const createdItems = [];
 
-  for (const item of items) {
-    if (!item.bookId || item.quantity == null || item.price == null) {
-      throw new Error("Missing required fields in one of the order items");
-    }
-
+  for (const cartItem of cartItems) {
     const orderItem = await OrderItem.create({
       orderId: new mongoose.Types.ObjectId(orderId),
-      bookId: new mongoose.Types.ObjectId(item.bookId),
-      quantity: item.quantity,
-      price: item.price,
-      totalPrice: item.price * item.quantity,
+      bookId: new mongoose.Types.ObjectId(cartItem.book),
+      quantity: cartItem.quantity,
+      price: cartItem.price,
+      totalPrice: cartItem.quantity * cartItem.price,
     });
 
     totalOrderPrice += orderItem.totalPrice;
     createdItems.push(orderItem);
   }
 
-  await Order.findByIdAndUpdate(orderId, {
-    $push: { orderItems: { $each: createdItems.map(i => i._id) } },
-    $inc: { totalPrice: totalOrderPrice },
-  });
+
+  // Optional: clear cart after creating order
+  await CartItemModel.deleteMany({});
 
   return { orderId, createdItems, totalOrderPrice };
 };
