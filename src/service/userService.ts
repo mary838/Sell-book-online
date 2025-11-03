@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { userModel } from "@/models/userModel";
-import { handleError } from "@/constant/handleError";
+import { handleError } from "@/utils/response-util";
 
 export const getUserService = async (req: Request, res: Response) => {
     try {

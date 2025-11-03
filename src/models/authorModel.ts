@@ -1,24 +1,22 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
-/**
- * Author Interface
- * Represents the Author document in MongoDB
- */
-export interface Author extends Document {
+export interface IAuthor extends Document {
   _id: Types.ObjectId;
-  name: string;
+  full_name: string;
+  email: string;
   phone: string;
-  dob: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  dob: Date;
+  nationality: string;
 }
 
-/**
- * Author Schema
- */
-const authorSchema = new Schema<Author>(
+const authorSchema = new Schema<IAuthor>(
   {
-    name: {
+    full_name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
       type: String,
       required: true,
       unique: true,
@@ -31,16 +29,20 @@ const authorSchema = new Schema<Author>(
       trim: true,
     },
     dob: {
+      type: Date,
+      required: true,
+    },
+    nationality: {
       type: String,
+      required: false,
+      trim: true,
     },
   },
   {
     timestamps: true,
-    versionKey: false, // optional: hides __v field
+    // versionKey: false, 
   }
 );
 
-/**
- * Author Model
- */
-export const authorModel = mongoose.model<Author>("Author", authorSchema);
+
+export const authorModel = mongoose.model<IAuthor>("Author", authorSchema);

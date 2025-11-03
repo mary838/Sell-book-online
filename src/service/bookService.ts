@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { bookModel } from "@/models/bookModel";
 import { categoryModel } from "@/models/categoryModel";
 import { CreateBookInput, IBook } from "@/types/book-type";
-import { handleError } from "@/constant/handleError";
+import { handleError } from "@/utils/response-util";
 
 // Get All Books
 export const getBookService = async (req: Request, res: Response) => {
