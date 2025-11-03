@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { AuthUser } from "@/types/auth-type";
-import { handleError } from "@/constant/handleError";
+import { handleError } from "@/utils/response-util";
 
 declare global {
   namespace Express {

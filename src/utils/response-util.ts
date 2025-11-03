@@ -6,7 +6,18 @@ export const handleError =(
     message: string,
 ): Response => {
     return res.status(status).json({
-        success: false,
         message,
     });
+};
+
+export const handleSuccess = (
+  res: Response,
+  status = 200,
+  message = "Success",
+  data?: unknown
+): Response => {
+  return res.status(status).json({
+    message,
+    data: data ?? null,
+  });
 };

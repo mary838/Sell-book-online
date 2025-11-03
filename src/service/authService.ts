@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { userModel } from "@/models/userModel";
 import { generateTokens } from "@/utils/jwt";
 import { Request, Response } from "express";
-import { handleError } from "@/constant/handleError";
+import { handleError } from "@/utils/response-util";
 import jwt from "jsonwebtoken";
 
 export const registerService = async (req: Request, res: Response) => {
