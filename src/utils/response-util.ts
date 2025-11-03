@@ -18,6 +18,6 @@ export const handleSuccess = (
 ): Response => {
   return res.status(status).json({
     message,
-    data: data ?? null,
+    data: data || null,
   });
 };

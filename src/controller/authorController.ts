@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { createAuthorService } from "@/service/authorService";
+import { createAuthorService, getAllAuthorsService } from "@/service/authorService";
 import { handleError, handleSuccess } from "@/utils/response-util";
+import { AppError } from "@/utils/app-error";
 
-export const createAuthorController = async (req: Request, res: Response): Promise<Response> => {
+export const createAuthorController = async (req: Request, res: Response) => {
   try {
     const author = await createAuthorService(req.body);
     return handleSuccess(res, 201, "Author created successfully.", author);
@@ -23,6 +24,20 @@ export const createAuthorController = async (req: Request, res: Response): Promi
       return handleError(res, 500, customError.message || "Failed to create author.");
     }
 
+    return handleError(res, 500, "An unexpected error occurred.");
+  }
+};
+
+export const getAllAuthorsController = async (req: Request, res: Response) => {
+  try {
+    const authors = await getAllAuthorsService();
+    return handleSuccess(res, 200, "Authors retrived successfully.", authors);
+  } catch (error) {
+    // console.error(error)
+    if (error instanceof AppError) {
+      return handleError(res, error.statusCode, error.message || "Failed to fetch authors.");
+    }
+    
     return handleError(res, 500, "An unexpected error occurred.");
   }
 };

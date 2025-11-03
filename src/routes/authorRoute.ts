@@ -1,6 +1,6 @@
 
 import { Router } from "express";
-import { createAuthorController } from "../controller/authorController";
+import { createAuthorController, getAllAuthorsController } from "../controller/authorController";
 
 const AuthorRouter = Router();
 
@@ -13,6 +13,6 @@ AuthorRouter.post("/authors", createAuthorController);
 // // DELETE /api/author/:id
 // AuthorRouter.delete("/deleted-author/:id", deleteAuthorController);
 // // GET /api/authors
-// AuthorRouter.get("/authors", getAllAuthorsController);
+AuthorRouter.get("/authors", getAllAuthorsController);
 
 export default AuthorRouter;
